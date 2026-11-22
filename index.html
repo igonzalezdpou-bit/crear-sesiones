@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programa tus sesiones</title>
+<meta name="theme-color" content="#2343d6">
+<meta name="description" content="Técnicas para programar sesiones y crear sesiones de 50 minutos.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sesiones">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday, para docentes: claro y sencillo
+   IDEA un fichero de aula con pestañas de colores, como separadores de una carpeta
+   PICTURE las pestañas de colores y las fichas desplegables
+   COLOUR fondo blanco, banda azul cobalto, un color por categoría
+   TYPE Fredoka para títulos + Nunito para texto
+   LAYOUT título; fila de pestañas; panel de la categoría con fichas que se abren */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e1120);--ink:light-dark(#14172b,#eceefa);--soft:light-dark(#5a5f7a,#a9aecb);--card:light-dark(#f3f4fa,#181c30);--line:light-dark(#dfe2ee,#2a2f4a)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Fredoka,Nunito,sans-serif;font-weight:600;line-height:1.1;margin:0}
+.wrap{max-width:960px;margin:0 auto;padding-inline:max(4vw,16px)}
+.top{background:#2343d6;color:#fff;padding-block:clamp(22px,4vw,40px) 0}
+.top h1{font-size:clamp(30px,5vw,44px)}
+.top p{margin:6px 0 20px;color:#dfe5ff;font-size:17px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:700 15px Nunito,sans-serif;min-height:44px;padding:8px 14px;border:0;border-radius:12px 12px 0 0;cursor:pointer;background:color-mix(in srgb,var(--c) 30%,#2343d6);color:#fff;text-align:left}
+.tab:hover{background:color-mix(in srgb,var(--c) 55%,#2343d6)}
+.tab[aria-selected=true]{background:var(--bg);color:var(--c)}
+.tab:focus-visible,summary:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+.panel{padding-block:26px 40px}
+.panel h2{font-size:clamp(26px,4vw,34px);color:var(--c)}
+.panel>p{margin:6px 0 20px;color:var(--soft);max-width:65ch}
+details{background:var(--card);border-radius:14px;margin-bottom:10px;border:1.5px solid transparent}
+details[open]{border-color:var(--c)}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px;min-height:56px}
+summary::-webkit-details-marker{display:none}
+summary h3{font-size:19px;flex:1}
+summary .t{font-size:13px;font-weight:700;color:var(--c);white-space:nowrap}
+summary .ar{flex:none;width:28px;height:28px;border-radius:50%;background:var(--c);color:var(--bg);display:grid;place-items:center;font-weight:800;transition:transform .2s}
+details[open] .ar{transform:rotate(45deg)}
+.body{padding:0 16px 18px}
+.body h4{margin:14px 0 4px;font:600 16px Fredoka,sans-serif;color:var(--c)}
+.body p{margin:0}
+.body ol{margin:0;padding-left:1.3em}
+.body li{margin-bottom:4px}
+.ej{background:color-mix(in srgb,var(--c) 10%,var(--bg));border-radius:10px;padding:10px 12px}
+.ses{display:grid;gap:10px;margin-top:6px}
+.mo{display:grid;grid-template-columns:150px minmax(0,1fr) 90px;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:10px 14px;border-left:0}
+.mo b{font:600 18px Fredoka,sans-serif;color:var(--mc)}
+.mo small{display:block;color:var(--soft);font-size:13px;line-height:1.3}
+.mo select{font:inherit;font-size:16px;width:100%;min-height:44px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 8px}
+.mo .mm{text-align:right;font-weight:800;white-space:nowrap}
+.meter{height:18px;border-radius:9px;background:var(--card);overflow:hidden;margin:8px 0 4px}
+.meter i{display:block;height:100%;background:var(--c);transition:width .3s}
+.meter.over i{background:#d62839}
+.sum{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-weight:700}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.btns button{font:700 15px Nunito,sans-serif;min-height:44px;padding:0 16px;border-radius:12px;border:0;cursor:pointer;background:#2343d6;color:#fff}
+.btns button.y{background:#ffd34d;color:#14172b}
+.btns button:focus-visible,.mo select:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+#msg{min-height:1.4em;color:var(--soft);font-size:14px}
+#copybox{display:none;width:100%;min-height:160px;margin-top:8px;font:14px/1.5 Nunito,sans-serif;border-radius:10px;padding:10px}
+@media(max-width:600px){.mo{grid-template-columns:minmax(0,1fr) auto}.mo select{grid-column:1/-1;grid-row:2}}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}}
+footer{color:var(--soft);font-size:14px;border-top:1px solid var(--line);padding-block:20px 30px}
+@media(max-width:600px){.tab{flex:1 1 45%;font-size:14px}summary .t{display:none}}
+@media(prefers-reduced-motion:reduce){.ar{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="wrap">
+  <h1>Programa tus sesiones</h1>
+  <p>Monta tu sesión de 50 minutos o abre una categoría y pulsa cada técnica para ver cómo se hace.</p>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Categorías"></div>
+ </div>
+</header>
+<main class="wrap panel" id="panel" role="tabpanel"></main>
+<footer class="wrap">Clasificación tomada del índice de <i>Programa tus clases</i> (Alba Sabuco). Explicaciones y ejemplos de elaboración propia, orientativos y pensados para 2.º de Primaria.</footer>
+<script>
+{
+const CATS=[
+{id:'act',n:'Activación de contenidos',c:'light-dark(#d35400,#ff9a4d)',d:'Para empezar: conectan con lo que el alumnado ya sabe, despiertan la curiosidad y dejan claro qué se va a aprender.'},
+{id:'ver',n:'Verificación de la comprensión',c:'light-dark(#2343d6,#8ea2ff)',d:'Comprobaciones rápidas durante la explicación para saber, en el momento, si hay que seguir, repetir o cambiar de camino.'},
+{id:'for',n:'Evaluación formativa',c:'light-dark(#00797c,#4fd1d4)',d:'Recogen evidencias al final de la sesión para planificar la siguiente y dar retroalimentación.'},
+{id:'grc',n:'Práctica grupo clase',c:'light-dark(#c62834,#ff7b85)',d:'Dinámicas con toda la clase en movimiento para practicar, debatir y compartir.'},
+{id:'coo',n:'Estructuras de cooperativo',c:'light-dark(#6a24a8,#c69bf0)',d:'Estructuras que garantizan que todos los miembros del equipo participan y aprenden juntos.'},
+{id:'sum',n:'Evaluación sumativa',c:'light-dark(#1b1f3b,#b9c0e3)',d:'Formas de evaluar al cierre de una unidad o proyecto, más allá del examen tradicional.'},
+{id:'met',n:'Metacognición',c:'light-dark(#8a6400,#f2c94c)',d:'Ayudan al alumnado a pensar sobre su propio aprendizaje: qué ha aprendido, cómo y para qué.'},
+{id:'rec',n:'Recuperación de información',c:'light-dark(#ad1457,#ff7fb3)',d:'Obligan a traer a la memoria lo aprendido, lo que fortalece el recuerdo a largo plazo.'},
+{id:'mul',n:'Multinivel',c:'light-dark(#2e7d1a,#7fd65c)',d:'Propuestas con distintos niveles de dificultad o formatos para que cada alumno encuentre su reto.'},
+{id:'tra',n:'Transiciones',c:'light-dark(#007ba3,#5cd0f5)',d:'Pausas activas de 2 a 3 minutos entre actividades para recuperar la atención.'},
+{id:'agr',n:'Agrupamiento preestablecido',c:'light-dark(#8a4b14,#e0a46c)',d:'Sistemas para formar parejas y equipos en segundos, variados y sin discusiones.'}
+];
+const T=[
+{n:'Agenda',c:['act'],m:3,g:'Grupo clase',q:'Mostrar al empezar el plan de la sesión: el objetivo y los momentos que vamos a vivir. El alumnado sabe qué va a pasar y para qué, lo que da seguridad y sentido.',p:['Escribe el objetivo en lenguaje del alumnado: «Hoy vamos a aprender a…».','Enumera de 3 a 5 momentos de la sesión, con un icono para cada uno.','Al acabar cada momento, márcalo o mueve una pinza.','En el cierre vuelve al objetivo: ¿lo hemos conseguido?'],e:'Agenda visual con pictogramas en la pizarra; el encargado o encargada del día mueve la pinza al pasar de una actividad a otra.'},
+{n:'Asamblea',c:['act'],m:10,g:'Grupo clase',q:'Conversación en círculo para conectar el nuevo tema con experiencias y conocimientos previos. Crea clima y da voz a todo el grupo.',p:['Sentaos en círculo, a poder ser en el suelo o en sillas sin mesas.','Lanza una pregunta, enseña un objeto o una imagen sorprendente.','Usa un objeto de la palabra: solo habla quien lo tiene.','Recoge las ideas clave en un cartel que quedará visible.'],e:'«¿Quién ha plantado alguna vez una semilla? ¿Qué pasó?» con la pelota de la palabra, antes de empezar las plantas.'},
+{n:'Do-now',c:['act'],m:5,g:'Individual',q:'Tarea breve que el alumnado encuentra preparada al entrar y empieza solo y en silencio, sin explicación previa. Centra la atención desde el primer minuto y repasa lo anterior.',p:['Prepara 3 a 5 preguntas cortas sobre sesiones anteriores.','Déjalas proyectadas o escritas antes de que entren.','Da 3 a 5 minutos de trabajo individual.','Corrige en voz alta con rapidez y enlaza con lo nuevo.'],e:'Tres sumas y una palabra para separar en sílabas en la pizarra al volver del recreo; se hace en la mini pizarra.'},
+{n:'Pregunta esencial',c:['act'],m:10,g:'Grupo clase',q:'Pregunta amplia y abierta, sin una sola respuesta, que da sentido a toda la unidad y se retoma varias veces.',p:['Formula una pregunta que invite a pensar: «¿Por qué…?», «¿Qué pasaría si…?».','Déjala escrita en un lugar visible del aula durante la unidad.','Recoge las primeras respuestas y guárdalas.','Al final, vuelve a responderla y comparad cómo han cambiado las ideas.'],e:'«¿Podríamos vivir sin plantas?» al iniciar la unidad de seres vivos.'},
+{n:'Nube de palabras',c:['act'],m:8,g:'Grupo clase',q:'El alumnado aporta las palabras que asocia al tema y se construye una nube en la que destacan las más repetidas. Muestra de un vistazo qué sabe ya el grupo.',p:['Di el tema o enseña una imagen.','Cada alumno escribe de 1 a 3 palabras en pósits.','Agrupad las repetidas y escribid más grandes las más frecuentes.','Comentad qué sabemos y qué palabras echamos de menos.'],e:'Pósits de colores en la pizarra sobre «el otoño»; también se puede hacer con una herramienta digital de nubes de palabras.'},
+{n:'KWL',c:['act'],m:15,g:'Grupo clase',q:'Tabla de tres columnas: lo que sé (Know), lo que quiero saber (Want) y lo que he aprendido (Learned). En español se conoce como SQA. Activa conocimientos y despierta preguntas.',p:['Al iniciar la unidad, rellenad juntos «Qué sé».','Completad «Qué quiero saber» con preguntas del alumnado.','Dejad el mural visible durante la unidad.','Al terminar, completad «Qué he aprendido» y comprobad qué preguntas se han respondido.'],e:'Mural de clase con frases cortas y dibujos; cada pregunta del alumnado se firma con su nombre.'},
+{n:'Pizarras blancas',c:['ver'],m:5,g:'Individual',q:'Cada alumno responde en una mini pizarra y todos la levantan a la vez. En segundos ves quién ha entendido y quién necesita ayuda.',p:['Lanza una pregunta de respuesta breve.','Deja un tiempo corto para escribir.','«3, 2, 1, ¡arriba!»: todos muestran a la vez.','Decide: seguir, volver a explicar o reunir a quien lo necesite.'],e:'Dictado de palabras con «ge/gue» o sumas con llevadas: se ve enseguida dónde está el error.'},
+{n:'Escritura rápida',c:['ver'],m:3,g:'Individual',q:'Durante 1 a 3 minutos el alumnado escribe sin parar lo que ha entendido de una idea. Hace visible el pensamiento de todos, no solo de quien levanta la mano.',p:['Da una consigna clara: «Explica con tus palabras…».','Pon el cronómetro a la vista.','Se escribe sin borrar ni pararse a corregir.','Lee algunas en voz alta o recógelas para revisar.'],e:'«Explica a un amigo qué es un ser vivo»: una o dos frases, o un dibujo con una frase.'},
+{n:'Opción múltiple',c:['ver'],m:5,g:'Individual',q:'Pregunta con varias respuestas en la que las opciones incorrectas son los errores típicos. Así no solo sabes quién falla, sino por qué.',p:['Escribe la pregunta y usa como distractores los errores más frecuentes.','Todos muestran la letra a la vez (tarjetas o dedos).','Observa cómo se reparten las respuestas.','Pide que justifiquen la correcta y por qué las otras no lo son.'],e:'Tres opciones con dibujos: ¿cuál de estos animales es un mamífero? Tarjetas de colores A, B y C.'},
+{n:'Verdadero/Falso',c:['ver'],m:5,g:'Individual',q:'Afirmaciones que el alumnado valora con una señal sencilla. Es rápido y permite detectar ideas erróneas muy extendidas.',p:['Prepara de 5 a 8 afirmaciones, alguna con un error habitual.','Responden a la vez: pulgar arriba o abajo, tarjeta verde o roja.','Pide que corrijan las falsas para que sean verdaderas.'],e:'Versión en movimiento: de pie si es verdadero, sentados si es falso.'},
+{n:'El punto más engorroso',c:['ver'],m:3,g:'Individual',q:'Tras una explicación, cada alumno anota qué parte le ha quedado menos clara. Te da información exacta para ajustar la siguiente sesión.',p:['Pregunta: «¿Qué es lo que menos claro te ha quedado?».','Responden en un papelito, si quieren de forma anónima.','Agrupa las respuestas por temas.','Empieza la sesión siguiente aclarando lo que más se repite.'],e:'Señalar en los pasos de la resta llevando en qué paso se pierden, con un gomet rojo.'},
+{n:'Antes pensaba, ahora sé',c:['ver'],m:5,g:'Individual',q:'Rutina de pensamiento que ayuda al alumnado a darse cuenta de cómo ha cambiado su idea sobre un tema tras aprenderlo.',p:['Al acabar, completan «Antes pensaba…».','Después completan «Ahora sé…».','Comparten en parejas y algunos en voz alta.'],e:'«Antes pensaba que las plantas comían tierra; ahora sé que fabrican su alimento con la luz.» Puede hacerse de forma oral.'},
+{n:'Brain dump',c:['ver','for'],m:5,g:'Individual',q:'«Vaciado de cerebro»: escribir todo lo que se recuerda de un tema sin mirar apuntes. Sirve para comprobar lo aprendido y, a la vez, para practicar la recuperación.',p:['Di el tema y entrega una hoja en blanco.','De 2 a 4 minutos escribiendo o dibujando todo lo que recuerden.','Después abren el libro y completan con otro color lo que faltaba.','Comentad qué es lo que más se ha olvidado.'],e:'Hoja en blanco con dibujos y palabras sueltas sobre «los animales vertebrados».'},
+{n:'Exit Ticket',c:['for'],m:4,g:'Individual',q:'Tarjeta de salida: una o varias preguntas breves que se responden antes de terminar. Muestra qué ha quedado de la sesión y orienta la siguiente.',p:['Prepara 1 a 3 preguntas ligadas al objetivo del día.','Responden en un papel o tarjeta.','Las entregan al salir (o al ir al recreo).','Clasifícalas en tres montones: lo tiene, casi, aún no. Úsalo para planificar.'],e:'Una pregunta y una carita para autoevaluarse (me ha resultado fácil, normal o difícil).'},
+{n:'One minute paper',c:['for'],m:3,g:'Individual',q:'En un minuto, el alumnado responde: ¿qué es lo más importante que he aprendido hoy? y ¿qué pregunta me queda?',p:['Proyecta las dos preguntas.','Un minuto de escritura individual.','Recoge los papeles y lee las preguntas pendientes.','Responde las más repetidas al día siguiente.'],e:'En 2.º puede hacerse oral en parejas o con un dibujo y una palabra.'},
+{n:'4 esquinas',c:['grc'],m:10,g:'Grupo clase',q:'Cada esquina del aula representa una opción. El alumnado se coloca en la que elige, comenta con quienes están allí y defiende su postura.',p:['Etiqueta las esquinas (A, B, C, D o grados de acuerdo).','Plantea una pregunta o dilema.','Cada uno se mueve a su esquina sin hablar.','Los grupos comentan y un portavoz explica por qué.'],e:'«¿Dónde vive este animal?» con las esquinas Agua, Tierra, Aire y Bajo tierra, con dibujos.'},
+{n:'Galería',c:['grc'],m:15,g:'Equipos',q:'Los trabajos se exponen por el aula como en un museo y el alumnado los recorre para observar y dejar comentarios.',p:['Cuelga las producciones en distintos puntos del aula.','Los equipos recorren la galería con un tiempo por parada.','En cada trabajo dejan un pósit: algo que me gusta y una pregunta o idea.','Cada autor lee los comentarios recibidos.'],e:'Estrellas y deseos: un gomet de estrella para lo que gusta y un pósit con un deseo para mejorar.'},
+{n:'Lee la clase',c:['grc'],m:15,g:'Parejas',q:'Se distribuyen por el aula textos, imágenes o tarjetas con información y el alumnado se desplaza para leerlos y recoger datos en una hoja de registro.',p:['Prepara de 6 a 10 carteles con información breve.','Cuélgalos por las paredes del aula.','Reparte una hoja de registro con preguntas o huecos.','Las parejas recorren el aula y completan la hoja; al final se corrige en común.'],e:'Carteles con frases cortas sobre animales y una ficha con huecos: «El ___ tiene plumas».'},
+{n:'Question Trail',c:['grc'],m:20,g:'Parejas',q:'Circuito de preguntas encadenadas por el aula: cada tarjeta tiene arriba una respuesta y abajo una pregunta nueva. Resolver bien te lleva a la tarjeta siguiente, por eso es autocorrectivo.',p:['Prepara tarjetas en cadena: la respuesta de una aparece en la cabecera de otra.','Repártelas por el aula sin orden.','Cada pareja empieza en una tarjeta distinta y anota el recorrido.','Si vuelven a la tarjeta de salida, el circuito está bien resuelto.'],e:'Tarjetas con sumas y restas: el resultado 15 está en la cabecera de la tarjeta con la siguiente operación.'},
+{n:'Da 1 / coge 1',c:['grc'],m:10,g:'Parejas',q:'Cada alumno escribe ideas, se levanta y las intercambia con compañeros: da una y recoge otra. Amplía las ideas de todos y mueve al grupo.',p:['Cada uno escribe 2 o 3 ideas sobre el tema.','Suena la música y todos caminan por el aula.','Al parar, se juntan en parejas: cada uno da una idea y anota la que recibe.','Repetid 3 o 4 rondas y compartid las mejores ideas.'],e:'Tarjetas con «Un animal que…»; se intercambian y cada uno pega las recibidas en su hoja.'},
+{n:'Esto o aquello',c:['grc'],m:8,g:'Grupo clase',q:'Se presentan dos opciones y el alumnado elige colocándose a un lado u otro del aula. Después justifica su elección.',p:['Marca dos zonas del aula con cada opción.','Muestra el elemento o la pregunta.','Todos se colocan en su lado.','Pide a varias personas de cada lado que expliquen por qué.'],e:'«¿Es un ser vivo o un ser inerte?» con imágenes de una piedra, una seta, un robot…'},
+{n:'Círculo interior',c:['grc'],m:10,g:'Parejas',q:'Dos círculos concéntricos, uno mirando hacia fuera y otro hacia dentro. Las parejas que quedan enfrente hablan sobre una pregunta y después un círculo gira para cambiar de pareja.',p:['Forma un círculo interior y otro exterior enfrentados.','Lanza una pregunta: primero habla el de dentro y luego el de fuera.','A tu señal, el círculo exterior gira un puesto.','Nueva pregunta o la misma con la nueva pareja.'],e:'«Cuéntale a tu pareja tu animal favorito y dónde vive»; se gira con una palmada.'},
+{n:'Think pair share',c:['coo'],m:8,g:'Parejas',q:'Pienso solo, comparto en pareja y compartimos con la clase. Todos tienen tiempo para pensar antes de hablar y practican su respuesta antes de decirla en voz alta.',p:['Plantea una pregunta abierta.','Un minuto de pensamiento individual en silencio.','Dos minutos para contarlo a la pareja y mejorar la respuesta.','Algunas parejas comparten con el grupo.'],e:'Con el compañero de hombro: «¿Qué crees que necesita una planta para vivir?».'},
+{n:'Round Robin',c:['coo'],m:5,g:'Equipos',q:'Por turnos dentro del equipo, cada miembro aporta oralmente una idea. Nadie se salta su turno y todos escuchan.',p:['Plantea una pregunta con muchas respuestas posibles.','Empieza el número 1 y sigue en el sentido de las agujas del reloj.','Cada uno dice una idea; si no se le ocurre, puede decir «paso» una vez.','Varias rondas hasta agotar ideas.'],e:'«Decid palabras que empiecen por br»: el equipo hace rondas hasta quedarse sin ideas.'},
+{n:'Jigsaw',c:['coo'],m:30,g:'Equipos',q:'Rompecabezas: cada miembro del equipo se convierte en experto de una parte del contenido y luego la enseña a los demás. Nadie puede completar la tarea sin los otros.',p:['Divide el contenido en tantas partes como miembros tiene el equipo.','Cada miembro estudia su parte.','Los expertos en la misma parte se reúnen para preparar la explicación.','Vuelven a su equipo y cada uno enseña su parte.'],e:'Cuatro animales, uno por miembro. En 2.º, simplifícalo sin grupo de expertos o con una ficha guía.'},
+{n:'Folio giratorio',c:['coo'],m:10,g:'Equipos',q:'Un folio va pasando por los miembros del equipo; cada uno escribe su aportación y lo pasa. Al final hay un trabajo común con la contribución de todos.',p:['Plantea la tarea (listar ideas, escribir un cuento, resolver pasos).','Empieza uno y, tras su aportación, pasa el folio en el sentido de las agujas del reloj.','Mientras uno escribe, el resto observa y ayuda.','Leed el resultado final en equipo.'],e:'Cada miembro con un color de lápiz distinto para ver su aportación; cuento encadenado de cuatro frases.'},
+{n:'4-2-1',c:['coo'],m:12,g:'Equipos',q:'Embudo de ideas: cada persona piensa varias ideas, en pareja seleccionan las mejores y el equipo elige una para presentar. Enseña a comparar, seleccionar y justificar.',p:['Individualmente, cada uno escribe 4 ideas.','En pareja, eligen las 2 mejores entre las 8.','En equipo, eligen 1 y acuerdan por qué es la mejor.','Cada equipo presenta su idea elegida.'],e:'En 2.º se puede reducir a 2-1: dos ideas cada uno y una por pareja. Por ejemplo, el título de un cuento.'},
+{n:'Pienso, debatimos, escribimos',c:['coo'],m:15,g:'Equipos',q:'Primero cada uno piensa su respuesta, después el equipo la debate y finalmente redactan una respuesta común consensuada.',p:['Pregunta y tiempo de reflexión individual.','Ronda en la que todos explican su idea.','Debate para llegar a un acuerdo.','El secretario escribe la respuesta acordada y todos la firman.'],e:'«¿Por qué hay que cuidar los árboles?»: la frase final la escribe el secretario de la semana.'},
+{n:'Examen competencial',c:['sum'],m:45,g:'Individual',q:'Prueba basada en situaciones reales donde el alumnado aplica lo aprendido, no solo lo recuerda. Las preguntas tienen distintos niveles de complejidad.',p:['Parte de un contexto cercano y realista.','Diseña tareas que pidan comprender, aplicar y razonar.','Gradúa la dificultad de las preguntas.','Comparte antes los criterios o la rúbrica.'],e:'«Organizamos la merienda de clase»: leer etiquetas, sumar precios y decidir qué comprar.'},
+{n:'Proyecto',c:['sum'],m:0,g:'Equipos',q:'Trabajo a lo largo de varias sesiones que responde a un reto o pregunta y termina en un producto que se comparte. Se evalúan el proceso y el producto.',p:['Plantea un reto con sentido para el alumnado.','Planifica fases, productos intermedios y roles.','Evalúa durante el proceso con rúbricas y diarios.','Presentad el producto a un público real.'],e:'«¿Cómo podemos atraer pájaros al patio?»: comederos, carteles informativos y presentación a otra clase.'},
+{n:'Tarea final',c:['sum'],m:50,g:'Equipos',q:'Actividad integradora al final de la unidad que pide usar todo lo aprendido para elaborar un producto concreto.',p:['Define el producto desde el inicio de la unidad.','Ve trabajando en las sesiones los aprendizajes que necesitará.','Dedica una o dos sesiones a elaborarlo.','Evalúalo con una rúbrica sencilla conocida por todos.'],e:'Un folleto de un animal con su ficha: alimentación, hábitat y cómo nace.'},
+{n:'Presentación oral',c:['sum'],m:0,g:'Individual',q:'El alumnado explica en voz alta lo aprendido ante el grupo. Evalúa el contenido y también la expresión oral.',p:['Da un guion sencillo y un tiempo máximo.','Deja tiempo para ensayar en parejas.','Presentaciones con apoyo visual.','Evalúa con rúbrica y abre un turno de preguntas del público.'],e:'1 o 2 minutos con un dibujo o un objeto como apoyo; la clase hace una pregunta al final.'},
+{n:'Elección multinivel',c:['sum'],m:0,g:'Individual',q:'El alumnado elige entre varias tareas de evaluación de distinta complejidad o formato para demostrar lo aprendido, con los mismos criterios para todos.',p:['Diseña 3 o 4 tareas que evalúen el mismo aprendizaje.','Varía el formato (escribir, dibujar, explicar oralmente, construir) o la dificultad.','Explica qué se valorará en cualquiera de ellas.','Cada alumno elige y realiza la suya.'],e:'Demostrar el ciclo de la planta con un cómic, una maqueta o una explicación grabada.'},
+{n:'Portfolio de actividades',c:['sum'],m:0,g:'Individual',q:'Colección de trabajos seleccionados por el alumnado que muestran su progreso a lo largo del tiempo, acompañados de una breve reflexión.',p:['Prepara una carpeta por alumno.','Periódicamente, cada uno elige un trabajo para guardar.','Añade una frase: «Lo elijo porque…».','Revisadlo en tutorías o con las familias.'],e:'Carpeta con «mi mejor trabajo del mes» y una frase de por qué lo elige.'},
+{n:'Puntos cardinales',c:['met'],m:10,g:'Grupo clase',q:'Rutina de pensamiento para analizar una idea o propuesta desde cuatro puntos de vista, como una brújula: lo que entusiasma, lo que preocupa, lo que se necesita saber y la sugerencia o postura.',p:['Dibuja una rosa de los vientos.','Este: ¿qué me entusiasma de esta idea?','Oeste: ¿qué me preocupa o qué obstáculos veo?','Norte: ¿qué necesito saber? Sur: ¿qué sugiero o cuál es mi postura?'],e:'Ante «vamos a tener un huerto en clase»: rosa de los vientos en el suelo con pósits en cada punto.'},
+{n:'Escalera de metacognición',c:['met'],m:8,g:'Individual',q:'Secuencia de preguntas en forma de peldaños que guía al alumnado a reflexionar sobre su aprendizaje.',p:['¿Qué he aprendido?','¿Cómo lo he aprendido?','¿Para qué me ha servido?','¿En qué otras ocasiones puedo usarlo?'],e:'Escalera dibujada en un mural o en el suelo: se sube un peldaño con cada respuesta.'},
+{n:'Ideas de evaluación formativa +…',c:['rec'],m:5,g:'Individual',q:'Reutilizar las técnicas de evaluación formativa (pizarras, exit ticket, brain dump…) sobre contenidos de semanas o meses anteriores, para que el alumnado los recupere de forma espaciada.',p:['Dedica los primeros minutos a contenidos de hace una semana y de hace un mes.','Mezcla temas distintos.','Sin nota: es práctica, no examen.','Anota qué contenidos se olvidan para volver a ellos.'],e:'Los lunes, tres preguntas en las mini pizarras: una de la semana pasada, una del mes pasado y una del trimestre anterior.'},
+{n:'Crea una chuleta sobre el contenido de la lección',c:['rec'],m:15,g:'Individual',q:'Resumir lo aprendido en una tarjeta de tamaño limitado. Obliga a seleccionar lo esencial y a organizarlo.',p:['Entrega una tarjeta pequeña.','Explica que solo cabe lo más importante.','Pueden usar palabras clave, dibujos y esquemas.','Usadlas en un juego de repaso o compartidlas.'],e:'Una cuartilla con dibujos y palabras clave sobre los tipos de animales.'},
+{n:'Prepara una pregunta para el examen con el contenido',c:['rec'],m:10,g:'Individual',q:'Cada alumno redacta una pregunta, con su respuesta, sobre lo aprendido. Pensar una buena pregunta exige comprender el contenido.',p:['Explica qué es una buena pregunta (clara y con una respuesta comprobable).','Cada uno escribe su pregunta y la solución.','Revisadlas en parejas.','Usa las mejores en repasos o en la prueba.'],e:'Preguntas orales para un concurso de clase con los equipos.'},
+{n:'Salsas',c:['mul'],m:20,g:'Individual',q:'La misma tarea en niveles de «picante» (suave, picante, muy picante). Cada alumno elige el reto que puede asumir y se anima a subir de nivel.',p:['Prepara tres versiones de la misma actividad.','Identifícalas con 1, 2 o 3 guindillas.','Cada alumno elige por dónde empezar.','Quien termina puede pasar al siguiente nivel.'],e:'Problemas de suma: con dibujos (suave), con números (picante), de dos pasos (muy picante).'},
+{n:'Menú',c:['mul'],m:30,g:'Individual',q:'Tareas organizadas como la carta de un restaurante: un entrante obligatorio, un plato principal a elegir y un postre opcional de ampliación.',p:['Entrante: actividad breve que hacen todos.','Principal: 2 o 3 opciones entre las que se elige una.','Postre: reto voluntario para quien termina.','Presenta el menú en un cartel o ficha.'],e:'Entrante: leer un texto. Principal: dibujar la escena o responder preguntas. Postre: inventar otro final.'},
+{n:'Puzzle',c:['mul'],m:25,g:'Individual',q:'Las actividades son piezas de un puzle: al completar cada tarea se consigue una pieza, y hay piezas de distintos niveles. Al terminar se descubre la imagen completa.',p:['Prepara una imagen dividida en piezas.','Asocia a cada pieza una actividad, de dificultad variada.','El alumnado elige el orden y consigue piezas al completar tareas.','Al final, cada uno monta su imagen.'],e:'Imagen de un animal en 6 piezas; cada pieza es una ficha de ortografía de distinto nivel.'},
+{n:'3 en raya',c:['mul'],m:30,g:'Individual',q:'Tablero de 3 × 3 con nueve tareas. El alumnado elige tres que formen línea, con lo que combina formatos y niveles.',p:['Diseña nueve tareas sobre el mismo contenido.','Coloca en el centro la tarea esencial (todas las líneas pasan por ella si quieres que sea obligatoria).','Cada alumno elige su línea.','Marca las casillas completadas.'],e:'Tablero de lectura: leer en voz alta, dibujar al protagonista, cambiar el final…'},
+{n:'Puntos',c:['mul'],m:30,g:'Individual',q:'Cada tarea vale unos puntos según su dificultad y el alumnado debe conseguir una puntuación combinando las que elija.',p:['Prepara tareas de 1, 2 y 3 puntos.','Fija la meta (por ejemplo, 6 puntos).','Cada uno elige su combinación.','Revisa que las elecciones supongan un reto adecuado.'],e:'Meta de 6 puntos con fichas de cálculo de 1, 2 y 3 puntos.'},
+{n:'Tablero de elección',c:['mul'],m:30,g:'Individual',q:'Panel con actividades variadas para trabajar un mismo objetivo. El alumnado elige una o varias según sus intereses y formas de aprender.',p:['Define el objetivo de aprendizaje.','Diseña 6 a 9 actividades de distintos tipos (escribir, dibujar, construir, contar…).','Indica cuántas hay que hacer.','Pon en común lo elaborado.'],e:'Para los oficios: entrevistar a un familiar, hacer una maqueta, dibujar las herramientas o escribir una adivinanza.'},
+{n:'Busca las diferencias',c:['tra'],m:2,g:'Grupo clase',q:'Dos imágenes casi iguales proyectadas: el grupo busca las diferencias en un tiempo limitado. Recupera la atención visual.',p:['Proyecta las dos imágenes.','Da un minuto de búsqueda en silencio.','Señalad las diferencias en común.'],e:'Imágenes relacionadas con el tema, por ejemplo dos paisajes de otoño.'},
+{n:'Trabalenguas',c:['tra'],m:2,g:'Grupo clase',q:'Repetir un trabalenguas cada vez más rápido. Activa, divierte y trabaja la articulación y la memoria.',p:['Muestra el trabalenguas escrito.','Leedlo despacio todos juntos.','Repetidlo cada vez más rápido o sin mirar.'],e:'Trabalenguas con el sonido que se está trabajando en lectoescritura (r, tr, bl…).'},
+{n:'Encuentra el intruso',c:['tra'],m:2,g:'Grupo clase',q:'Serie de elementos en la que uno no encaja. Hay que encontrarlo y explicar por qué; a veces hay varias respuestas válidas.',p:['Proyecta 4 o 5 elementos.','Tiempo breve para pensar.','Varias personas explican qué intruso eligen y por qué.'],e:'Perro, gato, águila, vaca: ¿el águila porque vuela o porque no es mamífero?'},
+{n:'Ilusiones ópticas',c:['tra'],m:2,g:'Grupo clase',q:'Imagen que engaña a la vista. Se pregunta qué ven y se comentan las distintas percepciones.',p:['Proyecta la ilusión.','Pregunta qué ven sin dar pistas.','Revela el truco y comentad.'],e:'La imagen del pato-conejo: ¿quién ve un pato y quién un conejo?'},
+{n:'Adivinanzas',c:['tra'],m:2,g:'Grupo clase',q:'Una adivinanza breve para pensar y reír entre actividades. Trabaja la comprensión y el lenguaje figurado.',p:['Lee la adivinanza despacio.','Dejad un tiempo antes de responder.','Quien acierta explica qué pista le ayudó.'],e:'Adivinanzas del tema de la unidad; más adelante, el alumnado inventa las suyas.'},
+{n:'Curiosidades',c:['tra'],m:2,g:'Grupo clase',q:'Un dato sorprendente para despertar el interés. Puede presentarse como «¿verdad o mentira?».',p:['Cuenta o proyecta el dato.','Pregunta si creen que es verdad.','Revela la respuesta y, si hay tiempo, de dónde viene.'],e:'«¿Verdad o mentira? El pulpo tiene tres corazones.» (Verdad.)'},
+{n:'Las horas',c:['agr'],m:2,g:'Parejas',q:'Cada alumno tiene una esfera de reloj con un compañero anotado en cada hora. Al decir «busca a tu pareja de las 3» se forman parejas rápidas y variadas.',p:['Entrega a cada alumno un reloj con varias horas marcadas.','Cada alumno busca una pareja distinta para cada hora y ambos se anotan.','Guardad el reloj en la carpeta.','Usa «pareja de las…» para cambiar de compañero sin perder tiempo.'],e:'En 2.º, solo cuatro horas: las 3, las 6, las 9 y las 12. Puedes formar tú las parejas para cuidar los emparejamientos.'},
+{n:'Tableros (Kagan)',c:['agr'],m:1,g:'Equipos',q:'Equipos estables de cuatro con posiciones fijas en la mesa: cada alumno sabe quién es su compañero de hombro (al lado) y de cara (enfrente). Se pasa de trabajo individual a pareja o equipo sin moverse.',p:['Forma equipos heterogéneos de 4.','Numera los puestos o asígnales un color.','Define parejas de hombro y de cara.','Da consignas como «los números 2 recogen el material».'],e:'Etiquetas en las mesas con números y colores; «compañero de hombro» y «compañero de cara».'},
+{n:'Partners in crime',c:['agr'],m:1,g:'Parejas',q:'Parejas fijas de referencia durante un periodo (una quincena, una unidad) para trabajar juntas cada vez que se pide «con tu compañero o compañera de…».',p:['Forma las parejas pensando en complementariedad.','Dales un nombre o un símbolo compartido.','Úsalas para revisar, explicar o practicar.','Renuévalas al acabar el periodo.'],e:'Parejas de lectura que se ayudan durante toda la unidad y tienen un nombre inventado por ellos.'},
+{n:'Figuras geométricas',c:['agr'],m:2,g:'Equipos',q:'Se reparten tarjetas con figuras de colores. Uniendo misma figura o mismo color se obtienen dos agrupamientos distintos con una sola tarjeta.',p:['Prepara tarjetas combinando figura y color.','Reparte una a cada alumno (al azar o de forma intencionada).','«Juntaos por figura» o «juntaos por color».','Usa los dos criterios en distintos momentos de la sesión.'],e:'Además se repasan las figuras: «los triángulos, a la mesa de la ventana».'},
+{n:'Cartas',c:['agr'],m:2,g:'Equipos',q:'Se usa una baraja para formar grupos: por mismo número, mismo palo o parejas que sumen una cantidad. Controlando qué cartas repartes decides los grupos.',p:['Selecciona las cartas según los grupos que quieres.','Reparte una a cada alumno.','Indica el criterio de agrupamiento.','Los grupos se forman en segundos.'],e:'Parejas cuyas cartas sumen 10: un agrupamiento que además practica el cálculo mental.'}
+];
+const SES={id:'ses',n:'Mi sesión (50 min)',c:'light-dark(#2343d6,#8ea2ff)'};
+const MOM=[
+{id:'agr',n:'Agrupar',h:'Formar parejas o equipos',cats:['agr']},
+{id:'ini',n:'Activar',h:'Conectar con lo que saben',cats:['act']},
+{id:'com',n:'Comprobar',h:'¿Lo están entendiendo?',cats:['ver']},
+{id:'pra',n:'Practicar',h:'El grueso de la sesión',cats:['grc','coo','mul']},
+{id:'pau',n:'Pausa',h:'Transición activa',cats:['tra']},
+{id:'cie',n:'Cerrar',h:'Evaluar, reflexionar, recordar',cats:['for','met','rec']}
+];
+const MAX=50;
+let sel;try{sel=JSON.parse(localStorage.getItem('pts-ses')||'null')}catch(e){}
+if(!sel)sel={agr:51,ini:2,com:6,pra:40,pau:49,cie:13};
+const saveSel=()=>{try{localStorage.setItem('pts-ses',JSON.stringify(sel))}catch(e){}};
+const poolOf=m=>T.map((t,j)=>j).filter(j=>T[j].m>0&&T[j].c.some(c=>m.cats.includes(c)));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const total=()=>MOM.reduce((a,m)=>a+(sel[m.id]!=null?T[sel[m.id]].m:0),0);
+function suggest(){
+ let best=null;
+ for(let k=0;k<200;k++){const s={};MOM.forEach(m=>{if(m.id!=='pra')s[m.id]=pick(poolOf(m))});
+  const rest=MAX-MOM.reduce((a,m)=>a+(s[m.id]!=null?T[s[m.id]].m:0),0);
+  const ok=poolOf(MOM[3]).filter(j=>T[j].m<=rest&&T[j].m>=rest-5);
+  if(ok.length){s.pra=pick(ok);best=s;break}}
+ if(best){sel=best;saveSel()}
+}
+function sesText(){
+ const L=[`SESIÓN DE ${MAX} MINUTOS · total previsto: ${total()} min`,''];
+ MOM.forEach((m,k)=>{const i=sel[m.id];if(i==null)return;const t=T[i];L.push(`${k+1}. ${m.n.toUpperCase()} · ${t.n} (${t.m} min, ${t.g.toLowerCase()})`);L.push('   '+t.q);t.p.forEach(x=>L.push('   - '+x));L.push('')});
+ return L.join('\n');
+}
+function drawSes(p){
+ const tot=total(),over=tot>MAX;
+ p.innerHTML=`<h2>Mi sesión de ${MAX} minutos</h2><p>Elige una técnica para cada momento. La barra suma los minutos para que la sesión encaje en ${MAX}.</p>
+ <div class="meter${over?' over':''}" aria-hidden="true"><i style="width:${Math.min(100,tot/MAX*100)}%"></i></div>
+ <div class="sum"><span>${tot} de ${MAX} min</span><span>${over?`Te pasas ${tot-MAX} min`:`Quedan ${MAX-tot} min`}</span></div>
+ <div class="ses">${MOM.map(m=>{const cc=CATS.find(c=>c.id===m.cats[0]).c;const i=sel[m.id];
+  const opts=m.cats.map(cid=>{const c=CATS.find(x=>x.id===cid);return `<optgroup label="${c.n}">${T.map((t,j)=>t.c.includes(cid)&&t.m>0?`<option value="${j}"${j===i?' selected':''}>${t.n} · ${t.m} min</option>`:'').join('')}</optgroup>`}).join('');
+  return `<div class="mo" style="--mc:${cc}"><div><b>${m.n}</b><small>${m.h}</small></div><select data-m="${m.id}" id="m-${m.id}" aria-label="Técnica para ${m.n}"><option value="">Sin técnica</option>${opts}</select><span class="mm">${i!=null?T[i].m+' min':'—'}</span></div>`}).join('')}</div>
+ <div class="btns"><button class="y" id="bsug">Sugerir una sesión de ${MAX} min</button><button id="bcop">Copiar sesión</button><button id="bclr">Vaciar</button></div>
+ <div id="msg" role="status"></div><textarea id="copybox" aria-label="Texto de la sesión"></textarea>
+ <p style="margin-top:14px;color:var(--soft)">Para ver cómo se hace cada técnica, abre su pestaña de categoría.</p>`;
+ p.querySelectorAll('select').forEach(s=>s.onchange=()=>{sel[s.dataset.m]=s.value===''?null:+s.value;saveSel();drawSes(p);document.getElementById('m-'+s.dataset.m).focus()});
+ $('#bsug').onclick=()=>{suggest();drawSes(p);$('#msg').textContent='Nueva propuesta lista. Cambia lo que quieras con los desplegables.'};
+ $('#bclr').onclick=()=>{MOM.forEach(m=>sel[m.id]=null);saveSel();drawSes(p)};
+ $('#bcop').onclick=()=>{const txt=sesText(),box=$('#copybox');const fb=()=>{box.style.display='block';box.value=txt;box.select();$('#msg').textContent='Selecciona y copia el texto.'};
+  try{navigator.clipboard.writeText(txt).then(()=>{$('#msg').textContent='Sesión copiada: pégala en tu programación.'}).catch(fb)}catch(e){fb()}};
+}
+const TABS=[SES,...CATS];
+const ids=TABS.map(c=>c.id);
+const $=s=>document.querySelector(s);
+const mins=t=>t.m?t.m+' min':'Varias sesiones';
+function show(id,focus){
+ const c=TABS.find(x=>x.id===id)||TABS[0];
+ $('#tabs').innerHTML=TABS.map(x=>`<button class="tab" role="tab" id="tab-${x.id}" data-id="${x.id}" style="--c:${x.c}" aria-selected="${x.id===c.id}" tabindex="${x.id===c.id?0:-1}">${x.n}</button>`).join('');
+ const p=$('#panel');p.style.setProperty('--c',c.c);p.setAttribute('aria-labelledby','tab-'+c.id);
+ if(c.id==='ses'){drawSes(p);if(focus)document.getElementById('tab-ses').focus();return}
+ p.innerHTML=`<h2>${c.n}</h2><p>${c.d}</p>`+T.filter(t=>t.c.includes(c.id)).map(t=>`<details><summary><h3>${t.n}</h3><span class="t">${mins(t)} · ${t.g}</span><span class="ar" aria-hidden="true">+</span></summary><div class="body"><h4>Qué es y para qué sirve</h4><p>${t.q}</p><h4>Cómo se hace</h4><ol>${t.p.map(x=>`<li>${x}</li>`).join('')}</ol><h4>Ejemplo en el aula</h4><p class="ej">${t.e}</p></div></details>`).join('');
+ if(focus)document.getElementById('tab-'+c.id).focus();
+}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;show(b.dataset.id,true);try{history.replaceState(null,'','#'+b.dataset.id)}catch(err){}});
+$('#tabs').addEventListener('keydown',e=>{const i=ids.indexOf(document.activeElement.dataset.id);if(i<0)return;let n=null;if(e.key==='ArrowRight')n=(i+1)%ids.length;if(e.key==='ArrowLeft')n=(i-1+ids.length)%ids.length;if(n!=null){e.preventDefault();show(ids[n],true)}});
+const start=()=>show(ids.includes(location.hash.slice(1))?location.hash.slice(1):'ses');
+window.addEventListener('hashchange',start);
+start();
+}
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+</script>
+</body>
+</html>
